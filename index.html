@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Everything - Your Pocket Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .device-body {
+            background: linear-gradient(145deg, #2d3436, #000000);
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 4px solid #444;
+        }
+        .widget-screen {
+            background: #1e272e;
+            color: #0be881;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 10px;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .mirror-surface {
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            border: 2px solid #636e72;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        video { transform: scaleX(-1); width: 100%; height: 100%; object-fit: cover; }
+        .btn-clicker:active { transform: scale(0.92); }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-gray-800">
+    <header class="py-8 text-center">
+        <h1 class="text-4xl font-black text-indigo-600 tracking-tight">MR. EVERYTHING</h1>
+        <p class="text-gray-500 mt-2">The Ultimate All-in-One Companion</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 flex flex-col items-center">
+        <div class="device-body w-72 h-[550px] p-6 relative flex flex-col gap-4 mb-10">
+            <div class="absolute -right-3 top-24 w-6 h-14 bg-gray-600 rounded-r-lg border-y-2 border-r-2 border-gray-800"></div>
+            
+            <div class="mirror-surface h-36 w-full rounded-2xl shadow-inner relative">
+                <span id="mirrorPlaceholder" class="text-[10px] text-gray-500 font-bold uppercase text-center p-2">Mirror Standby<br>(Tap Toggle)</span>
+                <video id="webcam" autoplay playsinline class="hidden"></video>
+            </div>
+            <button onclick="toggleMirror()" class="bg-indigo-500 text-white text-[10px] py-1.5 rounded-full font-bold uppercase tracking-wider">Toggle Mirror</button>
+
+            <div class="widget-screen h-28 p-4 text-center flex items-center justify-center">
+                <p id="speechBox" class="text-sm leading-tight italic">Tap for Positive Speech...</p>
+            </div>
+            <button onclick="generateSpeech()" class="bg-emerald-500 text-white font-bold py-3 rounded-xl btn-clicker shadow-lg uppercase text-xs tracking-widest">Positive Speech</button>
+
+            <div class="flex gap-4 mt-2">
+                <div class="widget-screen flex-1 h-20 flex flex-col items-center justify-center">
+                    <span class="text-[9px] uppercase opacity-60">Fav Number</span>
+                    <span id="numberDisplay" class="text-3xl font-bold">0</span>
+                </div>
+                <button onclick="incrementNumber()" class="w-20 h-20 bg-rose-500 rounded-full border-b-4 border-rose-800 shadow-lg btn-clicker flex items-center justify-center text-white font-black text-xl">PUSH</button>
+            </div>
+
+            <div class="flex justify-around mt-auto pb-2">
+                <div class="flex flex-col items-center"><div class="w-10 h-6 bg-white rounded-md border border-gray-300"></div><span class="text-[8px] mt-1 font-bold text-gray-400">MINTS</span></div>
+                <div class="flex flex-col items-center"><div class="w-10 h-6 bg-cyan-200 rounded-md border border-cyan-400"></div><span class="text-[8px] mt-1 font-bold text-gray-400">SYRUP</span></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const phrases = ["You are doing an amazing job!", "Stay at Positive Speed today!", "Believe in your ideas.", "Great things take time.", "You are a brilliant inventor!", "Kindness is a superpower.", "Keep moving forward!", "Your creativity has no limits!"];
+        function generateSpeech() {
+            const speechBox = document.getElementById('speechBox');
+            speechBox.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+        let count = 0;
+        function incrementNumber() {
+            count++;
+            document.getElementById('numberDisplay').innerText = count;
+        }
+        let cameraActive = false;
+        let stream = null;
+        async function toggleMirror() {
+            const video = document.getElementById('webcam');
+            const placeholder = document.getElementById('mirrorPlaceholder');
+            if (!cameraActive) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                    video.srcObject = stream;
+                    video.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    cameraActive = true;
+                } catch (err) { console.error(err); }
+            } else {
+                if (stream) stream.getTracks().forEach(t => t.stop());
+                video.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                cameraActive = false;
+            }
+        }
+    </script>
+</body>
+</html>
+
